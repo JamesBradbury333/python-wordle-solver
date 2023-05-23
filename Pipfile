@@ -6,7 +6,7 @@ name = "pypi"
 [scripts]
 format = "black ."
 lint = "flake8 -v"
-unit-test = "pytest tests/unit"
+unit-test = "python -m pytest tests/unit"
 
 [packages]
 scipy = "*"
