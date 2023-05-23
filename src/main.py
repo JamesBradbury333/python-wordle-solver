@@ -1,5 +1,6 @@
 import copy
 
+
 def main():
 
     inital_guess = "adieu"
@@ -17,13 +18,11 @@ def main():
     test_list = ["adieu", "cat", "dog", "zzz"]
     copy_list = copy.deepcopy(possible_words)
 
-
-
     for word in possible_words:
         for char in inital_guess:
             if char in list(word):
                 copy_list.remove(word)
-                break 
+                break
     print(len(copy_list))
 
     return
