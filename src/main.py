@@ -19,18 +19,25 @@ def main():
 
     reduced_words = remove_words_if_in_char_list(possible_words, list(inital_guess))
     normalised_letter_score_dict = rank_most_common_letters_in_word_list(reduced_words)
-    score_remaining_words(reduced_words, normalised_letter_score_dict)
+    remaining_word_scores = score_remaining_words(reduced_words, normalised_letter_score_dict)
+    new_word = max(remaining_word_scores, key=remaining_word_scores.get)
+    print(new_word)
 
     return
 
 # TODO: test this func
 def score_remaining_words(remainig_words_list, normalised_letter_score_dict):
     word_score_dict = dict.fromkeys(remainig_words_list, 0)
-    print(word_score_dict)
     for word in word_score_dict:
+        letters_parsed_so_far = []
         for letter in list(word):
-            word_score_dict[word] += normalised_letter_score_dict[letter]
+            if letter not in letters_parsed_so_far:
+                word_score_dict[word] += normalised_letter_score_dict[letter]
+            else:
+                word_score_dict[word] += (normalised_letter_score_dict[letter] * 0.2) #TODO: Decide how to weight letter repeats, placeholder 0.2 for now?
+            letters_parsed_so_far.append(letter)
     print(word_score_dict)
+    return word_score_dict
 
 
 # TODO: test this func
@@ -43,6 +50,7 @@ def remove_words_if_in_char_list(word_list, char_list):
                 copy_word_list.remove(word)
                 break
     return copy_word_list
+
 
 # TODO: test this func
 def rank_most_common_letters_in_word_list(word_list):
