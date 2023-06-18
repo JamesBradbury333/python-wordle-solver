@@ -1,28 +1,20 @@
 import copy
+from collections import namedtuple
+
+FIRST_GUESS = "adieu"
 
 
 def main():
-
-    inital_guess = "adieu"
     possible_letters = alphabet_letters_list()
 
-    wordle = "flyby"
+    secret_wordle_word = "flyby"
+
+    wordle_word = WordleWord(5)
 
     with open("../5-letter-words.txt") as file:
         possible_words = file.read().split("\n")
 
-    reduced_words = remove_words_if_in_char_list(possible_words, list(inital_guess))
-    normalised_letter_score_dict = rank_most_common_letters_in_word_list(reduced_words)
-    remaining_word_scores = score_remaining_words(
-        reduced_words, normalised_letter_score_dict
-    )
-    # TODO: In 2 picks we remove all possible words from word pool. Algo needs to decide 
-    # What to do if letter in wordle
-    new_word = max(remaining_word_scores, key=remaining_word_scores.get)
-    print(new_word)
-    print(len(reduced_words))
-    reduced_words = remove_words_if_in_char_list(reduced_words, list(new_word))
-    print(reduced_words)
+    first_guess = FIRST_GUESS
 
     return
 
@@ -83,7 +75,7 @@ class WordleWord:
     """The Wordle Word, made up of indexes recording what a letter is/isn't/could be."""
 
     def __init__(self, number_of_letters_in_wordle: int):
-        if number_of_letters_in_wordle > 0 and number_of_letters_in_wordle < 10:
+        if number_of_letters_in_wordle != 5:
             raise ValueError(
                 f"A wordle can only be 5 letters long,"
                 f"not {number_of_letters_in_wordle} letters long."
@@ -91,6 +83,10 @@ class WordleWord:
         self.wordle_letters = []
         for i in range(0, number_of_letters_in_wordle):
             self.wordle_letters.append(WordlePosition(i))
+
+    # TODO: Method for updating wordle following a guess
+
+    # TODO: Method for updating remaining words following a guess
 
 
 class WordlePosition:
@@ -112,6 +108,44 @@ class WordlePosition:
         self.is_not_letters.append(guessed_letter)
         if guessed_letter in self.could_be_letters:
             self.could_be_letters.remove(guessed_letter)
+
+
+class WordleGuessedWord:
+    """Records the details of a guessed word"""
+
+    def __init__(self, guessed_word):
+        wordle_guess_letters = []
+        if len(guessed_word) != 5:
+            raise ValueError("Guessed word can only be 5 chars long")
+        guessed_word = list(guessed_word)
+        for i, char in enumerate(guessed_word):
+            letter_in_correct_pos = char == FIRST_GUESS[i]
+            letter_in_wordle = char in guessed_word
+            wordle_guess_letters.append(
+                WordleGuessedWordPosition(
+                    i, char, letter_in_correct_pos, letter_in_wordle
+                )
+            )
+
+
+class WordleGuessedWordPosition:
+    """Records the details of a letter in a guessed word"""
+
+    def __init__(
+        self,
+        unique_position_id: int,
+        letter_guessed: str,
+        letter_in_correct_pos: bool,
+        letter_in_wordle: bool,
+    ):
+        if letter_in_correct_pos and not letter_in_wordle:
+            raise AssertionError(
+                "If a letter is in the correct place it must also be in the wordle"
+            )
+        self.unique_position_id = unique_position_id
+        self.letter_guessed = letter_guessed
+        self.letter_in_correct_pos = letter_in_correct_pos
+        self.letter_in_wordle = letter_in_wordle
 
 
 if __name__ == "__main__":
