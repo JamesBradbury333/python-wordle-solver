@@ -1,0 +1,23 @@
+from main import alphabet_letters_list, remove_words_if_in_char_list, rank_most_common_letters_in_word_list, score_remaining_words
+
+def main():
+
+    inital_guess = "adieu"
+    possible_letters = alphabet_letters_list()
+
+    wordle = "flyby"
+
+    with open("../5-letter-words.txt") as file:
+        possible_words = file.read().split("\n")
+
+    reduced_words = remove_words_if_in_char_list(possible_words, list(inital_guess))
+    normalised_letter_score_dict = rank_most_common_letters_in_word_list(reduced_words)
+    remaining_word_scores = score_remaining_words(
+        reduced_words, normalised_letter_score_dict
+    )
+    # TODO: In 2 picks we remove all possible words from word pool. Algo needs to decide
+    # What to do if letter in wordle
+    new_word = max(remaining_word_scores, key=remaining_word_scores.get)
+    reduced_words = remove_words_if_in_char_list(reduced_words, list(new_word))
+
+    return
