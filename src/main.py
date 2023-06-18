@@ -6,24 +6,26 @@ def main():
     inital_guess = "adieu"
     possible_letters = alphabet_letters_list()
 
-    wordle = "boats"
+    wordle = "flyby"
 
     with open("../5-letter-words.txt") as file:
         possible_words = file.read().split("\n")
 
-    # make an inital guess
-    guess_letter = "a"
-
-    if guess_letter not in wordle:
-        possible_letters.remove(guess_letter)
-
     reduced_words = remove_words_if_in_char_list(possible_words, list(inital_guess))
     normalised_letter_score_dict = rank_most_common_letters_in_word_list(reduced_words)
-    remaining_word_scores = score_remaining_words(reduced_words, normalised_letter_score_dict)
+    remaining_word_scores = score_remaining_words(
+        reduced_words, normalised_letter_score_dict
+    )
+    # TODO: In 2 picks we remove all possible words from word pool. Algo needs to decide 
+    # What to do if letter in wordle
     new_word = max(remaining_word_scores, key=remaining_word_scores.get)
     print(new_word)
+    print(len(reduced_words))
+    reduced_words = remove_words_if_in_char_list(reduced_words, list(new_word))
+    print(reduced_words)
 
     return
+
 
 # TODO: test this func
 def score_remaining_words(remainig_words_list, normalised_letter_score_dict):
@@ -34,17 +36,20 @@ def score_remaining_words(remainig_words_list, normalised_letter_score_dict):
             if letter not in letters_parsed_so_far:
                 word_score_dict[word] += normalised_letter_score_dict[letter]
             else:
-                word_score_dict[word] += (normalised_letter_score_dict[letter] * 0.2) #TODO: Decide how to weight letter repeats, placeholder 0.2 for now?
+                word_score_dict[word] += (
+                    normalised_letter_score_dict[letter] * 0.2
+                )  # TODO: Decide how to weight letter repeats, placeholder 0.2 for now?
             letters_parsed_so_far.append(letter)
-    print(word_score_dict)
+    # print(word_score_dict)
     return word_score_dict
 
 
-# TODO: test this func
+# TODO: Re-write tests for this
 def remove_words_if_in_char_list(word_list, char_list):
     copy_word_list = copy.deepcopy(word_list)
 
     for word in word_list:
+        print(word)
         for char in char_list:
             if char in list(word):
                 copy_word_list.remove(word)
@@ -54,6 +59,8 @@ def remove_words_if_in_char_list(word_list, char_list):
 
 # TODO: test this func
 def rank_most_common_letters_in_word_list(word_list):
+    """Returns a dict with normalised scores for each letter in remaining word dict.
+    Higer occurrance of a letter grants a higher score."""
     letters_dict = dict.fromkeys(alphabet_letters_list(), 0)
     total_score_counter = 0
     for word in word_list:
