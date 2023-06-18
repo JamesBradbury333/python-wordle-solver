@@ -80,31 +80,38 @@ def alphabet_letters_list():
 
 
 class WordleWord:
-    def __init__(self):
-        self.position_0 = self.alphabet_letters_dict()
-        self.position_1 = self.alphabet_letters_dict()
-        # self.position_2 = self.alphabet_letters_dict()
-        # self.position_3 = self.alphabet_letters_dict()
-        # self.position_4 = self.alphabet_letters_dict()
-        self.letters_in_word = set()
-        self.letters_not_in_word = set()
-        self.possible_letters = self.alphabet_letters_list()
+    """The Wordle Word, made up of indexes recording what a letter is/isn't/could be."""
 
-    def alphabet_letters_list(self):
-        return list(map(chr, range(97, 123)))
+    def __init__(self, number_of_letters_in_wordle: int):
+        if number_of_letters_in_wordle > 0 and number_of_letters_in_wordle < 10:
+            raise ValueError(
+                f"A wordle can only be 5 letters long,"
+                f"not {number_of_letters_in_wordle} letters long."
+            )
+        self.wordle_letters = []
+        for i in range(0, number_of_letters_in_wordle):
+            self.wordle_letters.append(WordlePosition(i))
 
-    def alphabet_letters_dict(self):
-        return dict.fromkeys(self.alphabet_letters_list(), "maybe")
 
-    def guess_a_letter(self, letter: str, in_word: bool, in_correct_position: bool):
-        if in_correct_position:
-            self.position_0[letter] = True
-            self.letters_in_word.add(letter)
-        if in_word:
-            self.position_0[letter] = False
-            self.letters_in_word.add(letter)
-        else:
-            self.letters_in_word.add(letter)
+class WordlePosition:
+    """Represents an index of a letter in the wordle word"""
+
+    def __init__(self, unique_position_id: int):
+        self.unique_position_id = unique_position_id
+        self.true_letter = None
+        self.could_be_letters = []
+        self.is_not_letters = []
+
+    def this_position_guessed_correct(self, guessed_letter: str):
+        self.true_letter = guessed_letter
+
+    def add_letter_might_be(self, guessed_letter: str):
+        self.could_be_letters.append(guessed_letter)
+
+    def letter_guess_not_in_this_position(self, guessed_letter: str):
+        self.is_not_letters.append(guessed_letter)
+        if guessed_letter in self.could_be_letters:
+            self.could_be_letters.remove(guessed_letter)
 
 
 if __name__ == "__main__":
