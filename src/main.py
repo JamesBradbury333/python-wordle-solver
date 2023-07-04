@@ -1,20 +1,36 @@
 import copy
-from collections import namedtuple
 
 FIRST_GUESS = "adieu"
+SECRET_WORDLE_WORD = "flyby"
 
 
 def main():
-    possible_letters = alphabet_letters_list()
-
-    secret_wordle_word = "flyby"
-
     wordle_word = WordleWord(5)
 
     with open("../5-letter-words.txt") as file:
         possible_words = file.read().split("\n")
 
     first_guess = FIRST_GUESS
+    first_guess = GuessResults()
+
+    wordle = WordleWord(5)
+    wordle.guess_a_word(first_guess)
+
+    print("Unique Pos ID:")
+    for j, wordle_pos in enumerate(wordle.wordle_letters):
+        print(wordle.wordle_letters[j].unique_position_id)
+
+    print("True Letters:")
+    for j, wordle_pos in enumerate(wordle.wordle_letters):
+        print(wordle.wordle_letters[j].true_letter)
+
+    print("could_be_letters:")
+    for j, wordle_pos in enumerate(wordle.wordle_letters):
+        print(wordle.wordle_letters[j].could_be_letters)
+
+    print("is_not_letters:")
+    for j, wordle_pos in enumerate(wordle.wordle_letters):
+        print(wordle.wordle_letters[j].is_not_letters)
 
     return
 
@@ -84,9 +100,26 @@ class WordleWord:
         for i in range(0, number_of_letters_in_wordle):
             self.wordle_letters.append(WordlePosition(i))
 
-    # TODO: Method for updating wordle following a guess
+    def guess_a_word(self, guessed_word):
+        for i, wordle_position in enumerate(self.wordle_letters):
+            if guessed_word.guess_letters[i].letter_is_correct == True:
+                wordle_position.true_letter = guessed_word.guess_letters[i].guess_letter
 
-    # TODO: Method for updating remaining words following a guess
+            elif guessed_word.guess_letters[i].letter_in_wordle == True:
+                wordle_position.is_not_letters = guessed_word.guess_letters[
+                    i
+                ].guess_letter
+                for pos in self.wordle_letters:
+                    if pos.unique_position_id != wordle_position.unique_position_id:
+                        wordle_position.could_be_letters.append(
+                            guessed_word.guess_letters[i].guess_letter
+                        )
+
+            else:
+                for pos in self.wordle_letters:
+                    pos.is_not_letters.append(
+                        guessed_word.guess_letters[i].guess_letter
+                    )
 
 
 class WordlePosition:
@@ -110,41 +143,50 @@ class WordlePosition:
             self.could_be_letters.remove(guessed_letter)
 
 
-class WordleGuessedWord:
-    """Records the details of a guessed word"""
+class GuessResults:
+    def __init__(self):
+        self.guess_letters = []
+        for i in range(5):
+            letter_idx = i
+            guess_letter = input(f"Letter idx {letter_idx} is:")
+            letter_is_correct = input(
+                "Letter is in the correct position (True or False):"
+            )
+            if letter_is_correct == "True":
+                letter_is_correct = True
+            else:
+                letter_is_correct = False
+            if letter_is_correct:
+                letter_in_wordle = True
+            else:
+                letter_in_wordle = input("Letter is in the wordle (True or False):")
+                if letter_in_wordle == "True":
+                    letter_in_wordle = True
+                else:
+                    letter_in_wordle = False
 
-    def __init__(self, guessed_word):
-        wordle_guess_letters = []
-        if len(guessed_word) != 5:
-            raise ValueError("Guessed word can only be 5 chars long")
-        guessed_word = list(guessed_word)
-        for i, char in enumerate(guessed_word):
-            letter_in_correct_pos = char == FIRST_GUESS[i]
-            letter_in_wordle = char in guessed_word
-            wordle_guess_letters.append(
-                WordleGuessedWordPosition(
-                    i, char, letter_in_correct_pos, letter_in_wordle
+            self.guess_letters.append(
+                GuessLetterPosition(
+                    letter_idx, guess_letter, letter_is_correct, letter_in_wordle
                 )
             )
 
 
-class WordleGuessedWordPosition:
-    """Records the details of a letter in a guessed word"""
-
+class GuessLetterPosition:
     def __init__(
         self,
-        unique_position_id: int,
-        letter_guessed: str,
-        letter_in_correct_pos: bool,
+        letter_idx: int,
+        guess_letter: str,
+        letter_is_correct: bool,
         letter_in_wordle: bool,
     ):
-        if letter_in_correct_pos and not letter_in_wordle:
-            raise AssertionError(
-                "If a letter is in the correct place it must also be in the wordle"
-            )
-        self.unique_position_id = unique_position_id
-        self.letter_guessed = letter_guessed
-        self.letter_in_correct_pos = letter_in_correct_pos
+        if letter_is_correct and not letter_in_wordle:
+            raise ValueError("If letter is correct it must be in wordle")
+        if letter_idx > 4:
+            raise ValueError("Guess letter index must be less than 5")
+        self.letter_idx = letter_idx
+        self.guess_letter = guess_letter
+        self.letter_is_correct = letter_is_correct
         self.letter_in_wordle = letter_in_wordle
 
 
