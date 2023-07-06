@@ -180,10 +180,19 @@ class GuessLetterPosition:
         letter_is_correct: bool,
         letter_in_wordle: bool,
     ):
+        if not isinstance(letter_idx, int):
+            raise ValueError("letter_id must be an integer")
+        if letter_idx < 0 or letter_idx > 4:
+            raise ValueError("Guess letter index must be between 0 and 4")
+        if not isinstance(guess_letter, str):
+            raise ValueError("guess letter must be a string")
+        if len(guess_letter) > 1:
+            raise ValueError("letter must be a single lowercase letter")
+        if guess_letter not in list(map(chr, range(97, 123))):
+            raise ValueError("The guessed letter must be a lowercase letter a-z")
         if letter_is_correct and not letter_in_wordle:
             raise ValueError("If letter is correct it must be in wordle")
-        if letter_idx > 4:
-            raise ValueError("Guess letter index must be less than 5")
+
         self.letter_idx = letter_idx
         self.guess_letter = guess_letter
         self.letter_is_correct = letter_is_correct
