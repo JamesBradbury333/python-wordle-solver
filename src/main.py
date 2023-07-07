@@ -11,6 +11,7 @@ def main():
         possible_words = file.read().split("\n")
 
     first_guess = FIRST_GUESS
+    # TODO: think I will test using tests from now on, main will not work for a while
     first_guess = GuessResults()
 
     wordle = WordleWord(5)
@@ -128,48 +129,58 @@ class WordlePosition:
     def __init__(self, unique_position_id: int):
         self.unique_position_id = unique_position_id
         self.true_letter = None
-        self.could_be_letters = []
+        self.might_be_letters = []
         self.is_not_letters = []
 
+    def assert_guessed_letter_correct_form(self, guessed_letter):
+        assert isinstance(guessed_letter, str)
+        assert len(guessed_letter) == 1
+        assert guessed_letter in list(map(chr, range(97, 123)))
+
     def this_position_guessed_correct(self, guessed_letter: str):
+        self.assert_guessed_letter_correct_form(guessed_letter)
+        if guessed_letter in self.is_not_letters:
+            raise ValueError(
+                "The correct letter cannot be in the list of is_not_letters."
+            )
         self.true_letter = guessed_letter
+        # TODO: Potentially later remove all letters from might_be_letters and add all others to _is_not_lettters
+        # This may help improve deciding on next set of letters to pick? For debugging purposes it may be useful
+        # to see the state up to the point that the correct letter was guessed?
 
     def add_letter_might_be(self, guessed_letter: str):
-        self.could_be_letters.append(guessed_letter)
+        self.assert_guessed_letter_correct_form(guessed_letter)
+        if guessed_letter in self.is_not_letters:
+            raise ValueError("A maybe letter cannot be in the list of is_not_letters.")
+        self.might_be_letters.append(guessed_letter)
 
     def letter_guess_not_in_this_position(self, guessed_letter: str):
+        self.assert_guessed_letter_correct_form(guessed_letter)
+        if guessed_letter == self.true_letter:
+            raise ValueError(
+                "Letter cannont be in list of not letters as it has been assigned to true letter for this idx"
+            )
         self.is_not_letters.append(guessed_letter)
-        if guessed_letter in self.could_be_letters:
-            self.could_be_letters.remove(guessed_letter)
+        if guessed_letter in self.might_be_letters:
+            self.might_be_letters.remove(guessed_letter)
 
 
 class GuessResults:
-    def __init__(self):
-        self.guess_letters = []
-        for i in range(5):
-            letter_idx = i
-            guess_letter = input(f"Letter idx {letter_idx} is:")
-            letter_is_correct = input(
-                "Letter is in the correct position (True or False):"
-            )
-            if letter_is_correct == "True":
-                letter_is_correct = True
-            else:
-                letter_is_correct = False
-            if letter_is_correct:
-                letter_in_wordle = True
-            else:
-                letter_in_wordle = input("Letter is in the wordle (True or False):")
-                if letter_in_wordle == "True":
-                    letter_in_wordle = True
-                else:
-                    letter_in_wordle = False
-
-            self.guess_letters.append(
-                GuessLetterPosition(
-                    letter_idx, guess_letter, letter_is_correct, letter_in_wordle
-                )
-            )
+    def __init__(
+        self,
+        guess_letter_0,
+        guess_letter_1,
+        guess_letter_2,
+        guess_letter_3,
+        guess_letter_4,
+    ):
+        self.guess_letters = [
+            guess_letter_0,
+            guess_letter_1,
+            guess_letter_2,
+            guess_letter_3,
+            guess_letter_4,
+        ]
 
 
 class GuessLetterPosition:
