@@ -7,7 +7,7 @@ name = "pypi"
 format = "black ."
 lint = "flake8 -v"
 coverage = "python -m pytest --cov"
-unit-test = "python -m pytest tests/unit -v"
+unit-test = "python -m pytest tests/unit -v --cov"
 
 [packages]
 scipy = "*"
