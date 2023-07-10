@@ -9,31 +9,12 @@ def main():
 
     with open("../5-letter-words.txt") as file:
         possible_words = file.read().split("\n")
+    # possible_words = possible_words.sort()
+    possible_words.sort()
+    print(possible_words)
 
     first_guess = FIRST_GUESS
-    # TODO: think I will test using tests from now on, main will not work for a while
-    first_guess = GuessResults()
 
-    wordle = WordleWord(5)
-    wordle.guess_a_word(first_guess)
-
-    print("Unique Pos ID:")
-    for j, wordle_pos in enumerate(wordle.wordle_letters):
-        print(wordle.wordle_letters[j].unique_position_id)
-
-    print("True Letters:")
-    for j, wordle_pos in enumerate(wordle.wordle_letters):
-        print(wordle.wordle_letters[j].true_letter)
-
-    print("could_be_letters:")
-    for j, wordle_pos in enumerate(wordle.wordle_letters):
-        print(wordle.wordle_letters[j].could_be_letters)
-
-    print("is_not_letters:")
-    for j, wordle_pos in enumerate(wordle.wordle_letters):
-        print(wordle.wordle_letters[j].is_not_letters)
-
-    return
 
 
 # TODO: test this func
@@ -105,14 +86,15 @@ class WordleWord:
         for i, wordle_position in enumerate(self.wordle_letters):
             if guessed_word.guess_letters[i].letter_is_correct == True:
                 wordle_position.true_letter = guessed_word.guess_letters[i].guess_letter
+                #TODO: Should could be letters and is not letters be updated to nothing and everything??
 
             elif guessed_word.guess_letters[i].letter_in_wordle == True:
-                wordle_position.is_not_letters = guessed_word.guess_letters[
+                wordle_position.is_not_letters.append(guessed_word.guess_letters[
                     i
-                ].guess_letter
+                ].guess_letter)
                 for pos in self.wordle_letters:
                     if pos.unique_position_id != wordle_position.unique_position_id:
-                        wordle_position.could_be_letters.append(
+                        wordle_position.might_be_letters.append(
                             guessed_word.guess_letters[i].guess_letter
                         )
 
@@ -165,7 +147,7 @@ class WordlePosition:
             self.might_be_letters.remove(guessed_letter)
 
 
-class GuessResults:
+class GuessedWord:
     def __init__(
         self,
         guess_letter_0,
