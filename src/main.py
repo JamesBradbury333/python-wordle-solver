@@ -90,11 +90,16 @@ class WordleWord:
                 self.set_true_letter_for_guess_wordle_position(
                     guess_letter, wordle_position
                 )
+                self.add_guess_letter_to_might_be_for_other_worlde_positions(
+                    guess_letter, wordle_position
+                )
 
             if (
                 guess_position.letter_is_correct is False
                 and guess_position.letter_in_wordle is True
             ):
+                if guess_letter not in wordle_position.is_not_letters:
+                    wordle_position.is_not_letters.append(guess_letter)
                 self.add_guess_letter_to_other_wordle_positions_might_be_list(
                     guess_letter, wordle_position, self.wordle_letters
                 )
@@ -111,19 +116,29 @@ class WordleWord:
     def add_guess_letter_to_other_wordle_positions_might_be_list(
         self, guess_letter, this_wordle_position, all_wordle_positions
     ):
-        this_wordle_position.is_not_letters.append(guess_letter)
-        for wordle_position in all_wordle_positions:
+        if guess_letter not in  this_wordle_position.is_not_letters:
+            this_wordle_position.is_not_letters.append(guess_letter)
+        self.add_guess_letter_to_might_be_for_other_worlde_positions(
+            guess_letter, this_wordle_position
+        )
+
+    def add_guess_letter_to_might_be_for_other_worlde_positions(
+        self, guess_letter, this_wordle_position
+    ):
+        for wordle_position in self.wordle_letters:
             if (
                 wordle_position.unique_position_id
                 == this_wordle_position.unique_position_id
             ):
                 pass
             else:
-                wordle_position.might_be_letters.append(guess_letter)
+                if guess_letter not in wordle_position.might_be_letters:
+                    wordle_position.might_be_letters.append(guess_letter)
 
     def add_letter_to_is_not_list(self, is_not_letter: str):
         for position in self.wordle_letters:
-            position.is_not_letters.append(is_not_letter)
+            if is_not_letter not in position.is_not_letters:
+                position.is_not_letters.append(is_not_letter)
 
 
 class WordlePosition:
