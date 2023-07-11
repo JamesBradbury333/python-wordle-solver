@@ -82,27 +82,43 @@ class WordleWord:
         for i in range(0, number_of_letters_in_wordle):
             self.wordle_letters.append(WordlePosition(i))
 
+    # True letters works
+    # might_be_letters not updated
+    # is_not_letters works
+    # TODO: refactor each of 3 steps into separate func for testing
     def guess_a_word(self, guessed_word):
         for i, wordle_position in enumerate(self.wordle_letters):
-            if guessed_word.guess_letters[i].letter_is_correct == True:
-                wordle_position.true_letter = guessed_word.guess_letters[i].guess_letter
-                #TODO: Should could be letters and is not letters be updated to nothing and everything??
+            guess_position = guessed_word.guess_word_positions[i]
+            guess_letter = guess_position.guess_letter
 
-            elif guessed_word.guess_letters[i].letter_in_wordle == True:
-                wordle_position.is_not_letters.append(guessed_word.guess_letters[
+            if guess_position.letter_is_correct == True:
+                self.set_true_letter_for_guess_wordle_position(guess_letter, wordle_position)
+
+            elif guessed_word.guess_word_positions[i].letter_in_wordle == True:
+                # This works
+                wordle_position.is_not_letters.append(guessed_word.guess_word_positions[
                     i
                 ].guess_letter)
+
+                # this doesn't work
                 for pos in self.wordle_letters:
-                    if pos.unique_position_id != wordle_position.unique_position_id:
+                    if pos.unique_position_id == wordle_position.unique_position_id:
+                        pass
+                    else:
                         wordle_position.might_be_letters.append(
-                            guessed_word.guess_letters[i].guess_letter
+                            guessed_word.guess_word_positions[i].guess_letter
                         )
 
-            else:
-                for pos in self.wordle_letters:
-                    pos.is_not_letters.append(
-                        guessed_word.guess_letters[i].guess_letter
-                    )
+            if guess_position.letter_is_correct is False and guess_position.letter_in_wordle is False:
+                self.add_letter_to_is_not_list(guess_letter)
+
+    def set_true_letter_for_guess_wordle_position(self, true_letter, wordle_position):
+        wordle_position.true_letter = true_letter
+
+    def add_letter_to_is_not_list(self, is_not_letter: str):
+        for position in self.wordle_letters:
+            position.is_not_letters.append(is_not_letter)
+        
 
 
 class WordlePosition:
@@ -156,7 +172,7 @@ class GuessedWord:
         guess_letter_3,
         guess_letter_4,
     ):
-        self.guess_letters = [
+        self.guess_word_positions = [
             guess_letter_0,
             guess_letter_1,
             guess_letter_2,
