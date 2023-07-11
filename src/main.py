@@ -116,7 +116,7 @@ class WordleWord:
     def add_guess_letter_to_other_wordle_positions_might_be_list(
         self, guess_letter, this_wordle_position, all_wordle_positions
     ):
-        if guess_letter not in  this_wordle_position.is_not_letters:
+        if guess_letter not in this_wordle_position.is_not_letters:
             this_wordle_position.is_not_letters.append(guess_letter)
         self.add_guess_letter_to_might_be_for_other_worlde_positions(
             guess_letter, this_wordle_position
