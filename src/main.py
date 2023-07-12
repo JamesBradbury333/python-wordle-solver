@@ -90,7 +90,7 @@ class WordleWord:
                 self.set_true_letter_for_guess_wordle_position(
                     guess_letter, wordle_position
                 )
-                self.add_guess_letter_to_might_be_for_other_worlde_positions(
+                self.add_guess_letter_to_might_be_for_other_wordle_positions(
                     guess_letter, wordle_position
                 )
 
@@ -100,29 +100,24 @@ class WordleWord:
             ):
                 if guess_letter not in wordle_position.is_not_letters:
                     wordle_position.is_not_letters.append(guess_letter)
-                self.add_guess_letter_to_other_wordle_positions_might_be_list(
-                    guess_letter, wordle_position, self.wordle_letters
+                self.add_guess_letter_to_might_be_for_other_wordle_positions(
+                    guess_letter, wordle_position
                 )
 
             if (
                 guess_position.letter_is_correct is False
                 and guess_position.letter_in_wordle is False
             ):
-                self.add_letter_to_is_not_list(guess_letter)
+                self.add_letter_to_all_is_not_lists(guess_letter)
 
     def set_true_letter_for_guess_wordle_position(self, true_letter, wordle_position):
+        if true_letter in wordle_position.is_not_letters:
+            raise ValueError(
+                f"{true_letter} cannot be wordle_position_idx {wordle_position.unique_position_id} as it is in the list of is_not_letters for this position: {wordle_position.is_not_letters}"
+            )
         wordle_position.true_letter = true_letter
 
-    def add_guess_letter_to_other_wordle_positions_might_be_list(
-        self, guess_letter, this_wordle_position, all_wordle_positions
-    ):
-        if guess_letter not in this_wordle_position.is_not_letters:
-            this_wordle_position.is_not_letters.append(guess_letter)
-        self.add_guess_letter_to_might_be_for_other_worlde_positions(
-            guess_letter, this_wordle_position
-        )
-
-    def add_guess_letter_to_might_be_for_other_worlde_positions(
+    def add_guess_letter_to_might_be_for_other_wordle_positions(
         self, guess_letter, this_wordle_position
     ):
         for wordle_position in self.wordle_letters:
@@ -132,11 +127,34 @@ class WordleWord:
             ):
                 pass
             else:
-                if guess_letter not in wordle_position.might_be_letters:
+                if (
+                    guess_letter not in wordle_position.might_be_letters
+                    and guess_letter not in wordle_position.is_not_letters
+                ):
                     wordle_position.might_be_letters.append(guess_letter)
 
-    def add_letter_to_is_not_list(self, is_not_letter: str):
+    def add_guess_letter_to_is_not_list_for_other_wordle_positions(
+        self, guess_letter, this_wordle_position
+    ):
+        for wordle_position in self.wordle_letters:
+            if (
+                wordle_position.unique_position_id
+                == this_wordle_position.unique_position_id
+            ):
+                pass
+            else:
+                if (
+                    guess_letter is not wordle_position.true_letter
+                    and guess_letter not in wordle_position.is_not_letters
+                ):
+                    wordle_position.is_not_letters.append(guess_letter)
+
+    def add_letter_to_all_is_not_lists(self, is_not_letter: str):
         for position in self.wordle_letters:
+            if is_not_letter == position.true_letter:
+                raise ValueError(
+                    f"Letter {is_not_letter} is True letter for posiiton {position.unique_position_id} so cannot be added to is_not_list"
+                )
             if is_not_letter not in position.is_not_letters:
                 position.is_not_letters.append(is_not_letter)
 
