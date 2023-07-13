@@ -148,6 +148,8 @@ class WordleWord:
                     and guess_letter not in wordle_position.is_not_letters
                 ):
                     wordle_position.is_not_letters.append(guess_letter)
+                if guess_letter in wordle_position.might_be_letters:
+                    wordle_position.might_be_letters.remove(guess_letter)
 
     def add_letter_to_all_is_not_lists(self, is_not_letter: str):
         for position in self.wordle_letters:
@@ -157,6 +159,8 @@ class WordleWord:
                 )
             if is_not_letter not in position.is_not_letters:
                 position.is_not_letters.append(is_not_letter)
+            if is_not_letter in position.might_be_letters:
+                position.might_be_letters.remove(is_not_letter)
 
 
 class WordlePosition:

@@ -84,7 +84,7 @@ def test_guess_a_word():
 def test_true_letter_cannot_be_in_in_is_not_letters():
     wordle = WordleWord(5)
     wordle_first_letter = wordle.wordle_letters[0]
-    wordle_first_letter.is_not_letters = ["a"]
+    wordle_first_letter.is_not_letters.append("a")
 
     guess = GuessedWord(
         GuessLetterPosition(0, "a", True, True),
@@ -109,3 +109,33 @@ def test_is_not_letters_cant_same_as_be_true_letter():
 
     with pytest.raises(ValueError):
         wordle.add_letter_to_all_is_not_lists("a")
+
+
+# TODO: Need a test to check that a letter cant be added to might_be list if it is part of the is_not list
+def test_not_in_might_be_and_is_not_list():
+    wordle = WordleWord(5)
+    wordle_first_letter = wordle.wordle_letters[0]
+    wordle_second_letter = wordle.wordle_letters[1]
+    wordle_first_letter.is_not_letters.append("a")
+
+    wordle.add_guess_letter_to_is_not_list_for_other_wordle_positions(
+        "a", wordle_second_letter
+    )
+    assert "a" not in wordle_first_letter.might_be_letters
+
+
+def test_is_not_letter_removed_from_might_be_list():
+    wordle = WordleWord(5)
+    wordle_first_letter = wordle.wordle_letters[0]
+    wordle_first_letter.might_be_letters.append("a")
+    assert "a" in wordle_first_letter.might_be_letters
+
+    wordle.add_letter_to_all_is_not_lists("a")
+    assert "a" not in wordle_first_letter.might_be_letters
+
+    wordle_first_letter.might_be_letters.append("a")
+    assert "a" in wordle_first_letter.might_be_letters
+    wordle.add_guess_letter_to_is_not_list_for_other_wordle_positions(
+        "a", wordle.wordle_letters[3]
+    )
+    assert "a" not in wordle_first_letter.might_be_letters
