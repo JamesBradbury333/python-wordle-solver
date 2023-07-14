@@ -1,8 +1,11 @@
 from pytest import approx
 
-from src.main import remove_words_if_in_char_list
-from src.main import alphabet_letters_list
-from src.main import rank_most_common_letters_in_word_list
+from src.main import (
+    remove_words_if_in_char_list,
+    alphabet_letters_list,
+    rank_most_common_letters_in_word_list,
+    score_remaining_words,
+)
 
 
 def test_remove_words_if_in_char_list():
@@ -13,7 +16,42 @@ def test_remove_words_if_in_char_list():
     assert remove_words_if_in_char_list(words, list("aaa")) == ["defgh", "zzzzz"]
 
 
-# TODO: This doesn't pass following normalisation of ranking
+def test_score_remaining_words():
+    remaining_words_list = ["jedis", "cat", "z"]
+    normalised_letter_score_dict = {
+        "a": 2,
+        "b": 0,
+        "c": 2,
+        "d": 1,
+        "e": 1,
+        "f": 0,
+        "g": 0,
+        "h": 0,
+        "i": 1,
+        "j": 1,
+        "k": 0,
+        "l": 0,
+        "m": 0,
+        "n": 0,
+        "o": 0,
+        "p": 0,
+        "q": 0,
+        "r": 0,
+        "s": 1,
+        "t": 2,
+        "u": 0,
+        "v": 0,
+        "w": 0,
+        "x": 0,
+        "y": 0,
+        "z": 0,
+    }
+
+    assert score_remaining_words(
+        remaining_words_list, normalised_letter_score_dict
+    ) == {"jedis": 5, "cat": 6, "z": 0}
+
+
 def test_rank_most_common_letters_in_word_list():
     word_list = ["aaa", "bb", "c"]
     assert rank_most_common_letters_in_word_list(word_list) == {
