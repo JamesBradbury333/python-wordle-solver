@@ -16,9 +16,8 @@ def main():
     first_guess = FIRST_GUESS
 
 
-# TODO: test this func
-def score_remaining_words(remainig_words_list, normalised_letter_score_dict):
-    word_score_dict = dict.fromkeys(remainig_words_list, 0)
+def score_remaining_words(remaining_words_list, normalised_letter_score_dict):
+    word_score_dict = dict.fromkeys(remaining_words_list, 0)
     for word in word_score_dict:
         letters_parsed_so_far = []
         for letter in list(word):
@@ -33,12 +32,10 @@ def score_remaining_words(remainig_words_list, normalised_letter_score_dict):
     return word_score_dict
 
 
-# TODO: Re-write tests for this
 def remove_words_if_in_char_list(word_list, char_list):
     copy_word_list = copy.deepcopy(word_list)
 
     for word in word_list:
-        print(word)
         for char in char_list:
             if char in list(word):
                 copy_word_list.remove(word)
@@ -46,7 +43,6 @@ def remove_words_if_in_char_list(word_list, char_list):
     return copy_word_list
 
 
-# TODO: test this func
 def rank_most_common_letters_in_word_list(word_list):
     """Returns a dict with normalised scores for each letter in remaining word dict.
     Higer occurrance of a letter grants a higher score."""
@@ -115,7 +111,7 @@ class WordleWord:
             raise ValueError(
                 f"{true_letter} cannot be wordle_position_idx {wordle_position.unique_position_id} as it is in the list of is_not_letters for this position: {wordle_position.is_not_letters}"
             )
-        wordle_position.true_letter = true_letter
+        wordle_position.this_position_guessed_correct(true_letter)
 
     def add_guess_letter_to_might_be_for_other_wordle_positions(
         self, guess_letter, this_wordle_position
@@ -131,7 +127,7 @@ class WordleWord:
                     guess_letter not in wordle_position.might_be_letters
                     and guess_letter not in wordle_position.is_not_letters
                 ):
-                    wordle_position.might_be_letters.append(guess_letter)
+                    wordle_position.add_letter_might_be(guess_letter)
 
     def add_guess_letter_to_is_not_list_for_other_wordle_positions(
         self, guess_letter, this_wordle_position
@@ -147,7 +143,7 @@ class WordleWord:
                     guess_letter is not wordle_position.true_letter
                     and guess_letter not in wordle_position.is_not_letters
                 ):
-                    wordle_position.is_not_letters.append(guess_letter)
+                    wordle_position.letter_guess_not_in_this_position(guess_letter)
                 if guess_letter in wordle_position.might_be_letters:
                     wordle_position.might_be_letters.remove(guess_letter)
 
@@ -158,7 +154,7 @@ class WordleWord:
                     f"Letter {is_not_letter} is True letter for posiiton {position.unique_position_id} so cannot be added to is_not_list"
                 )
             if is_not_letter not in position.is_not_letters:
-                position.is_not_letters.append(is_not_letter)
+                position.letter_guess_not_in_this_position(is_not_letter)
             if is_not_letter in position.might_be_letters:
                 position.might_be_letters.remove(is_not_letter)
 
@@ -184,9 +180,6 @@ class WordlePosition:
                 "The correct letter cannot be in the list of is_not_letters."
             )
         self.true_letter = guessed_letter
-        # TODO: Potentially later remove all letters from might_be_letters and add all others to _is_not_lettters
-        # This may help improve deciding on next set of letters to pick? For debugging purposes it may be useful
-        # to see the state up to the point that the correct letter was guessed?
 
     def add_letter_might_be(self, guessed_letter: str):
         self.assert_guessed_letter_correct_form(guessed_letter)
